@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      width: 300px;
+      padding: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-top: 10px;
+      box-sizing: border-box;
+      resize: vertical;
+    }
+    button {
+      background: #204BCC;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .button-container {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    #morseOutput {
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h4>Morse Code Encoder</h4>
+  <textarea id="textInput" placeholder="Type here..."></textarea>
+  <div class="button-container">
+    <button id="encodeButton">Encode</button>
+  </div>
+  <div id="morseOutput">
+    <textarea id="morseResult" readonly></textarea>
+    <button id="copyButton">Copy</button>
+  </div>
+  <script src="morse.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

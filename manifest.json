@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "MCS",
+  "version": "1.7",
+  "description": "MCS - Morse Code Sender",
+  "permissions": ["contextMenus", "scripting", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["morse.js", "content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png"
+    },
+    "default_title": "Morse Helper"
+  },
+  "icons": {
+    "16": "icon.png"
+  }
+}
