@@ -1,6 +1,6 @@
 # MCS-Morse-Code-Sender
 
- Watch these videos before proceeding [Video1](https://youtu.be/yYu-dECyqug?si=yCYbQO19MOmKi3pK) [Video2](https://youtu.be/TlbO0-N8Ha4)
+ Watch these videos before proceeding [Video1](https://youtu.be/yYu-dECyqug?si=yCYbQO19MOmKi3pK) & [Video2](https://youtu.be/TlbO0-N8Ha4)
 
 Steps:
 1 - Download the whole code first.
