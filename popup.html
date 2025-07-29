@@ -32,9 +32,17 @@
       display: none;
       margin-top: 10px;
     }
+    #powerButton {
+      background-color: #f44336; /* Red for Off */
+      float: right;
+    }
+    #powerButton.on {
+      background-color: #4CAF50; /* Green for On */
+    }
   </style>
 </head>
 <body>
+  <button id="powerButton">Loading...</button>
   <h4>Morse Code Encoder</h4>
   <textarea id="textInput" placeholder="Type here..."></textarea>
   <div class="button-container">
