@@ -1,9 +1,9 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 3.01,
   "name": "MCS",
-  "version": "1.7",
+  "version": "3.01",
   "description": "MCS - Morse Code Sender",
-  "permissions": ["contextMenus", "scripting", "activeTab"],
+  "permissions": ["contextMenus", "scripting", "activeTab", "storage"],
   "background": {
     "service_worker": "background.js"
   },
