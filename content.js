@@ -1,9 +1,15 @@
-// Function to create and show the "En" button
-function showEncodeButton(inputElement) {
-  // If a button already exists, remove it before creating a new one
-  const existing = document.querySelector(".morse-extension-btn");
-  if (existing) existing.remove();
+let isEnButtonEnabled = true;
 
+function controlEnButtonVisibility(isEnabled, inputElement) {
+  removeExistingButton(); 
+
+  if (isEnabled && inputElement) {
+
+    showEncodeButtonElement(inputElement);
+  }
+}
+
+function showEncodeButtonElement(inputElement) {
   const button = document.createElement("button");
   button.textContent = "En";
   button.style.position = "absolute";
@@ -19,31 +25,43 @@ function showEncodeButton(inputElement) {
   button.style.bottom = "5px";
 
   button.addEventListener("click", () => {
-    // Get the element's current text
     const isContentEditable = inputElement.isContentEditable;
     const textToEncode = isContentEditable ? inputElement.textContent : inputElement.value;
     const morse = textToMorse(textToEncode);
 
     if (isContentEditable) {
-      // Create a range to select all content
-      const range = document.createRange();
-      range.selectNodeContents(inputElement);
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      // Use document.execCommand to replace the selected text
-      document.execCommand('insertText', false, morse);
-
-    } else if (inputElement.tagName === 'TEXTAREA' || inputElement.tagName === 'INPUT') {
-      inputElement.value = morse;
+        inputElement.textContent = '';
+    } else {
+        inputElement.value = '';
     }
-    removeExistingButton();
+
+    const chars = morse.split('');
+    let index = 0;
+    const typeNextChar = () => {
+        if (index < chars.length) {
+            const char = chars[index];
+            if (isContentEditable) {
+                
+                inputElement.textContent += char;
+            } else {
+               
+                inputElement.value += char;
+            }
+
+            const event = new Event('input', { bubbles: true });
+            inputElement.dispatchEvent(event);
+
+            index++;
+            setTimeout(typeNextChar, 10);
+        } else {
+            removeExistingButton();
+        }
+    };
+    typeNextChar();
   });
 
   button.classList.add("morse-extension-btn");
 
-  // Check if the input element has a parent with a relative position.
   let container = inputElement.parentElement;
   while (container && container.tagName !== 'BODY') {
     const style = window.getComputedStyle(container);
@@ -56,7 +74,6 @@ function showEncodeButton(inputElement) {
   if (container && container.tagName !== 'BODY') {
     container.appendChild(button);
   } else {
-    // If no suitable parent is found, wrap the input element in a new div.
     const wrapper = document.createElement("div");
     wrapper.style.position = "relative";
     wrapper.style.display = "inline-block";
@@ -66,32 +83,51 @@ function showEncodeButton(inputElement) {
   }
 }
 
-// Function to remove the button
 function removeExistingButton() {
   const existing = document.querySelector(".morse-extension-btn");
   if (existing) existing.remove();
 }
 
-// Event listener for when a user focuses on a textbox.
-document.addEventListener("focusin", function(e) {
-  const target = e.target;
-  // Check for common text input fields, including contenteditable divs.
-  if (target && (target.tagName === "TEXTAREA" || target.tagName === "INPUT" || target.isContentEditable)) {
-    showEncodeButton(target);
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'toggleEnButton') {
+    isEnButtonEnabled = request.enabled;
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.tagName === "TEXTAREA" || activeElement.tagName === "INPUT" || activeElement.isContentEditable)) {
+        controlEnButtonVisibility(isEnButtonEnabled, activeElement);
+    } else {
+        removeExistingButton();
+    }
   }
 });
 
-// Use a MutationObserver to watch for new nodes being added to the DOM.
+chrome.storage.local.get(['isEnButtonEnabled'], (result) => {
+    if (result.isEnButtonEnabled !== undefined) {
+        isEnButtonEnabled = result.isEnButtonEnabled;
+    }
+
+});
+
+document.addEventListener("focusin", function(e) {
+  const target = e.target;
+  if (target && (target.tagName === "TEXTAREA" || target.tagName === "INPUT" || target.isContentEditable)) {
+    controlEnButtonVisibility(isEnButtonEnabled, target);
+  } else {
+    removeExistingButton();
+  }
+});
+
 const observer = new MutationObserver((mutations) => {
   mutations.forEach((mutation) => {
     mutation.addedNodes.forEach((node) => {
-      // Check if the added node is a potential input field
-      if (node.tagName === "TEXTAREA" || node.tagName === "INPUT" || (node.isContentEditable && node.id === 'ymail_body')) {
-        showEncodeButton(node);
+      if (node.nodeType === 1 && (node.tagName === "TEXTAREA" || node.tagName === "INPUT" || node.isContentEditable)) {
+        if (isEnButtonEnabled) {
+          if (document.activeElement === node || node.contains(document.activeElement)) {
+             controlEnButtonVisibility(isEnButtonEnabled, document.activeElement);
+          }
+        }
       }
     });
   });
 });
 
-// Start observing the entire document body for changes in the DOM.
 observer.observe(document.body, { childList: true, subtree: true });
